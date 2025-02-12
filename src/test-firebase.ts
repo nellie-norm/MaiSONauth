@@ -1,14 +1,14 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDg0ZrRMO7vAzjtcDWVxCVzDsAOwGsBkmY",
-  authDomain: "testauth-8c819.firebaseapp.com",
-  projectId: "testauth-8c819",
-  storageBucket: "testauth-8c819.firebasestorage.app",
-  messagingSenderId: "349071992801",
-  appId: "1:349071992801:web:45de9e18ee419fc63094a0",
-  measurementId: "G-XS1J1FKHDK"
+  apiKey: 'AIzaSyDg0ZrRMO7vAzjtcDWVxCVzDsAOwGsBkmY',
+  authDomain: 'testauth-8c819.firebaseapp.com',
+  projectId: 'testauth-8c819',
+  storageBucket: 'testauth-8c819.firebasestorage.app',
+  messagingSenderId: '349071992801',
+  appId: '1:349071992801:web:45de9e18ee419fc63094a0',
+  measurementId: 'G-XS1J1FKHDK',
 };
 
 const app = initializeApp(firebaseConfig);
@@ -31,7 +31,6 @@ export { auth };
 //     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
 //     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID
 //   });
-  
 
 // import { initializeApp } from "firebase/app";
 // import { getAuth } from "firebase/auth";

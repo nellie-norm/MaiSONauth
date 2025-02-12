@@ -1,21 +1,21 @@
-  // Add this at the top of your component
-  console.log('Environment check:', {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID
-  });
-  
+// Add this at the top of your component
+console.log('Environment check:', {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+});
+
 import { useState } from 'react';
 // Import auth from our test configuration instead of the main one
 import { auth } from '../test-firebase';
-import { 
-  signInWithEmailAndPassword, 
+import {
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
   sendPasswordResetEmail,
   sendEmailVerification,
-  AuthError 
+  AuthError,
 } from 'firebase/auth';
 
 function Login() {
@@ -115,24 +115,28 @@ function Login() {
     return (
       <div style={{ textAlign: 'center', width: '100%', maxWidth: '400px' }}>
         {error && (
-          <div style={{ 
-            color: '#DC2626',
-            backgroundColor: '#FEE2E2',
-            padding: '0.75rem',
-            borderRadius: '0.375rem',
-            marginBottom: '1rem'
-          }}>
+          <div
+            style={{
+              color: '#DC2626',
+              backgroundColor: '#FEE2E2',
+              padding: '0.75rem',
+              borderRadius: '0.375rem',
+              marginBottom: '1rem',
+            }}
+          >
             {error}
           </div>
         )}
         {success && (
-          <div style={{ 
-            color: '#059669',
-            backgroundColor: '#D1FAE5',
-            padding: '0.75rem',
-            borderRadius: '0.375rem',
-            marginBottom: '1rem'
-          }}>
+          <div
+            style={{
+              color: '#059669',
+              backgroundColor: '#D1FAE5',
+              padding: '0.75rem',
+              borderRadius: '0.375rem',
+              marginBottom: '1rem',
+            }}
+          >
             {success}
           </div>
         )}
@@ -143,19 +147,19 @@ function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              style={{ 
+              style={{
                 padding: '0.5rem',
                 borderRadius: '0.25rem',
                 border: '1px solid #ccc',
                 width: '100%',
-                marginBottom: '0.5rem'
+                marginBottom: '0.5rem',
               }}
             />
           </div>
-          <button 
+          <button
             type="submit"
             disabled={loading}
-            style={{ 
+            style={{
               backgroundColor: '#3B82F6',
               color: 'white',
               padding: '0.5rem 1rem',
@@ -165,7 +169,7 @@ function Login() {
               opacity: loading ? 0.7 : 1,
               width: '100%',
               maxWidth: '200px',
-              marginBottom: '1rem'
+              marginBottom: '1rem',
             }}
           >
             {loading ? 'Sending...' : 'Reset Password'}
@@ -182,7 +186,7 @@ function Login() {
             border: 'none',
             color: '#3B82F6',
             cursor: 'pointer',
-            textDecoration: 'underline'
+            textDecoration: 'underline',
           }}
         >
           Back to Sign In
@@ -194,24 +198,28 @@ function Login() {
   return (
     <div style={{ textAlign: 'center', width: '100%', maxWidth: '400px' }}>
       {error && (
-        <div style={{ 
-          color: '#DC2626',
-          backgroundColor: '#FEE2E2',
-          padding: '0.75rem',
-          borderRadius: '0.375rem',
-          marginBottom: '1rem'
-        }}>
+        <div
+          style={{
+            color: '#DC2626',
+            backgroundColor: '#FEE2E2',
+            padding: '0.75rem',
+            borderRadius: '0.375rem',
+            marginBottom: '1rem',
+          }}
+        >
           {error}
         </div>
       )}
       {success && (
-        <div style={{ 
-          color: '#059669',
-          backgroundColor: '#D1FAE5',
-          padding: '0.75rem',
-          borderRadius: '0.375rem',
-          marginBottom: '1rem'
-        }}>
+        <div
+          style={{
+            color: '#059669',
+            backgroundColor: '#D1FAE5',
+            padding: '0.75rem',
+            borderRadius: '0.375rem',
+            marginBottom: '1rem',
+          }}
+        >
           {success}
         </div>
       )}
@@ -222,12 +230,12 @@ function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
-            style={{ 
+            style={{
               padding: '0.5rem',
               borderRadius: '0.25rem',
               border: '1px solid #ccc',
               width: '100%',
-              marginBottom: '0.5rem'
+              marginBottom: '0.5rem',
             }}
           />
           <input
@@ -235,19 +243,21 @@ function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            style={{ 
+            style={{
               padding: '0.5rem',
               borderRadius: '0.25rem',
               border: '1px solid #ccc',
-              width: '100%'
+              width: '100%',
             }}
           />
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '1rem' }}>
-          <button 
-            type="submit" 
+        <div
+          style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '1rem' }}
+        >
+          <button
+            type="submit"
             disabled={loading}
-            style={{ 
+            style={{
               backgroundColor: '#3B82F6',
               color: 'white',
               padding: '0.5rem 1rem',
@@ -256,10 +266,10 @@ function Login() {
               cursor: loading ? 'not-allowed' : 'pointer',
               opacity: loading ? 0.7 : 1,
               flex: 1,
-              maxWidth: '200px'
+              maxWidth: '200px',
             }}
           >
-            {loading ? 'Processing...' : (isSignUp ? 'Sign Up' : 'Sign In')}
+            {loading ? 'Processing...' : isSignUp ? 'Sign Up' : 'Sign In'}
           </button>
         </div>
       </form>
@@ -275,16 +285,16 @@ function Login() {
             color: '#3B82F6',
             marginBottom: '1rem',
             cursor: 'pointer',
-            textDecoration: 'underline'
+            textDecoration: 'underline',
           }}
         >
           Forgot Password?
         </button>
       )}
-      <button 
+      <button
         onClick={handleGoogleSignIn}
         disabled={loading}
-        style={{ 
+        style={{
           backgroundColor: '#DC2626',
           color: 'white',
           padding: '0.5rem 1rem',
@@ -293,7 +303,7 @@ function Login() {
           cursor: loading ? 'not-allowed' : 'pointer',
           opacity: loading ? 0.7 : 1,
           width: '100%',
-          maxWidth: '200px'
+          maxWidth: '200px',
         }}
       >
         {loading ? 'Processing...' : 'Sign in with Google'}
@@ -306,7 +316,7 @@ function Login() {
           color: '#3B82F6',
           marginTop: '1rem',
           cursor: 'pointer',
-          textDecoration: 'underline'
+          textDecoration: 'underline',
         }}
       >
         {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
