@@ -7,23 +7,28 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  quality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci
-        
+      - run: npm ci
       - name: Check formatting
         run: npm run format:check
-        
+
+  build:
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - run: npm ci
       - name: Build
         run: npm run build
         env:
@@ -34,8 +39,13 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_SENDER }}
           VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APPID }}
 
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
       - name: Deploy to Firebase
-        if: github.ref == 'refs/heads/main'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
