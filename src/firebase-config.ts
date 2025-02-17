@@ -8,7 +8,7 @@ const firebaseConfig = {
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase once
@@ -20,4 +20,4 @@ export const db = getFirestore(app);
 
 // Debug log to check config
 console.log('Project ID:', firebaseConfig.projectId);
-console.log('Region:', 'eur3 (Europe)'); 
+console.log('Region:', 'eur3 (Europe)');

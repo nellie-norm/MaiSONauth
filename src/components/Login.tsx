@@ -75,7 +75,7 @@ function Login() {
         userId: userId,
         email: email,
         username: username,
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       });
 
       // Separately create and store ID
@@ -83,7 +83,7 @@ function Login() {
         userId: userId,
         value: `ID-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         createdAt: Timestamp.now(),
-        active: true
+        active: true,
       });
     } catch (error) {
       console.error('Error creating user profile:', error);
@@ -121,7 +121,7 @@ function Login() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validatePassword(password)) {
       return;
     }
@@ -187,7 +187,7 @@ function Login() {
   const getAllUsers = async () => {
     const usersRef = collection(db, 'users');
     const snapshot = await getDocs(usersRef);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   };
 
   // Search users by email
@@ -195,7 +195,7 @@ function Login() {
     const usersRef = collection(db, 'users');
     const q = query(usersRef, where('email', '==', email));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   };
 
   // Get users created in last 24 hours
@@ -204,7 +204,7 @@ function Login() {
     const usersRef = collection(db, 'users');
     const q = query(usersRef, where('createdAt', '>', yesterday));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   };
 
   // Search by username
@@ -212,7 +212,7 @@ function Login() {
     const usersRef = collection(db, 'users');
     const q = query(usersRef, where('username', '==', username));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   };
 
   if (isForgotPassword) {

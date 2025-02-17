@@ -10,7 +10,7 @@ const queryClient = new QueryClient();
 
 // List of admin email addresses
 const ADMIN_EMAILS = [
-  'nellie.norman@gmail.com'  // Add your admin email here
+  'nellie.norman@gmail.com', // Add your admin email here
 ];
 
 function App() {
