@@ -6,8 +6,7 @@ console.log('Environment check:', {
 });
 
 import { useState } from 'react';
-// Import auth from our test configuration instead of the main one
-import { auth } from '../test-firebase';
+import { auth } from '../firebase-config';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -17,38 +16,36 @@ import {
   sendEmailVerification,
   AuthError,
 } from 'firebase/auth';
+import { db } from '../firebase-config';
+import { collection, addDoc, Timestamp, query, where, getDocs } from 'firebase/firestore';
 
 function Login() {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
-  const getReadableError = (error: AuthError) => {
+  const getReadableErrorMessage = (error: any): string => {
     switch (error.code) {
+      case 'auth/invalid-credential':
+        return 'Incorrect email or password. Please try again.';
+      case 'auth/user-not-found':
+        return 'No account found with this email. Please sign up first.';
+      case 'auth/wrong-password':
+        return 'Incorrect password. Please try again.';
       case 'auth/email-already-in-use':
-        return 'An account with this email already exists. Try signing in instead.';
+        return 'An account with this email already exists.';
       case 'auth/weak-password':
-        return 'Password should be at least 6 characters long.';
+        return 'Password is too weak. Please choose a stronger password.';
       case 'auth/invalid-email':
         return 'Please enter a valid email address.';
-      case 'auth/operation-not-allowed':
-        return 'This sign in method is not enabled. Please contact support.';
-      case 'auth/popup-closed-by-user':
-        return 'Sign in was cancelled. Please try again.';
-      case 'auth/popup-blocked':
-        return 'Sign in popup was blocked by your browser. Please allow popups for this site.';
-      case 'auth/network-request-failed':
-        return 'Network error. Please check your internet connection and try again.';
-      case 'auth/user-not-found':
-        return 'No account found with this email address.';
-      case 'auth/wrong-password':
-        return 'Incorrect password. Try again or click "Forgot Password"';
       default:
-        return error.message || 'An error occurred. Please try again.';
+        return 'An error occurred. Please try again.';
     }
   };
 
@@ -64,10 +61,87 @@ function Login() {
       setSuccess('Password reset email sent! Check your inbox.');
       setError(null);
     } catch (error: any) {
-      setError(getReadableError(error));
+      setError(getReadableErrorMessage(error));
       setSuccess(null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const createUserProfile = async (userId: string, email: string, username: string) => {
+    try {
+      // Store user profile
+      await addDoc(collection(db, 'users'), {
+        userId: userId,
+        email: email,
+        username: username,
+        createdAt: Timestamp.now()
+      });
+
+      // Separately create and store ID
+      await addDoc(collection(db, 'ids'), {
+        userId: userId,
+        value: `ID-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        createdAt: Timestamp.now(),
+        active: true
+      });
+    } catch (error) {
+      console.error('Error creating user profile:', error);
+      throw error;
+    }
+  };
+
+  // Password validation function
+  const validatePassword = (password: string): boolean => {
+    const minLength = 8;
+    const hasNumber = /\d/.test(password);
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (password.length < minLength) {
+      setPasswordError('Password must be at least 8 characters long');
+      return false;
+    }
+    if (!hasNumber) {
+      setPasswordError('Password must contain at least one number');
+      return false;
+    }
+    if (!hasLetter) {
+      setPasswordError('Password must contain at least one letter');
+      return false;
+    }
+    if (!hasSpecialChar) {
+      setPasswordError('Password must contain at least one special character');
+      return false;
+    }
+
+    setPasswordError('');
+    return true;
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validatePassword(password)) {
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await createUserProfile(userCredential.user.uid, email, username);
+    } catch (error: any) {
+      console.error('Error:', error);
+      alert(getReadableErrorMessage(error));
+    }
+  };
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error: any) {
+      console.error('Error:', error);
+      alert(getReadableErrorMessage(error));
     }
   };
 
@@ -81,17 +155,13 @@ function Login() {
     try {
       setError(null);
       if (isSignUp) {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        if (userCredential.user) {
-          await sendEmailVerification(userCredential.user);
-          setSuccess('Account created! Please check your email to verify your account.');
-        }
+        await handleSignUp(e);
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        await handleSignIn(e);
       }
     } catch (error: any) {
       console.error('Auth error:', error);
-      setError(getReadableError(error));
+      setError(getReadableErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -105,10 +175,44 @@ function Login() {
       await signInWithPopup(auth, provider);
     } catch (error: any) {
       console.error('Google sign in error:', error);
-      setError(getReadableError(error));
+      setError(getReadableErrorMessage(error));
     } finally {
       setLoading(false);
     }
+  };
+
+  // Example queries:
+
+  // Get all users
+  const getAllUsers = async () => {
+    const usersRef = collection(db, 'users');
+    const snapshot = await getDocs(usersRef);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  };
+
+  // Search users by email
+  const searchByEmail = async (email: string) => {
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('email', '==', email));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  };
+
+  // Get users created in last 24 hours
+  const getRecentUsers = async () => {
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('createdAt', '>', yesterday));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  };
+
+  // Search by username
+  const searchByUsername = async (username: string) => {
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('username', '==', username));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   };
 
   if (isForgotPassword) {
@@ -241,7 +345,12 @@ function Login() {
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (isSignUp) {
+                validatePassword(e.target.value);
+              }
+            }}
             placeholder="Password"
             style={{
               padding: '0.5rem',
@@ -250,6 +359,12 @@ function Login() {
               width: '100%',
             }}
           />
+          {passwordError && isSignUp && (
+            <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+          )}
+          {isSignUp && !passwordError && password && (
+            <p className="text-green-500 text-sm mt-1">Password meets requirements</p>
+          )}
         </div>
         <div
           style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '1rem' }}
